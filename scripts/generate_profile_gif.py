@@ -40,7 +40,7 @@ def font(size, bold=False):
 FONT_TINY = font(5, True)
 FONT_SMALL = font(7, True)
 FONT_MED = font(10, True)
-FONT_BIG = font(22, True)
+FONT_BIG = font(17, True)
 
 
 def rect(d, xy, fill, outline="#111111", width=1):
@@ -51,6 +51,16 @@ def text_shadow(d, xy, text, fnt, fill="#fff5d6", shadow="#111111"):
     x, y = xy
     d.text((x + 2, y + 2), text, font=fnt, fill=shadow)
     d.text((x, y), text, font=fnt, fill=fill)
+
+
+def centered_shadow(d, box, text, fnt, fill="#fff5d6", shadow="#111111"):
+    left, top, right, bottom = box
+    bbox = d.textbbox((0, 0), text, font=fnt)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    x = left + (right - left - tw) // 2
+    y = top + (bottom - top - th) // 2 - 2
+    text_shadow(d, (x, y), text, fnt, fill, shadow)
 
 
 def draw_cloud(d, x, y, scale=1):
@@ -107,7 +117,7 @@ def draw_title(d):
     for p in [(101, 13), (220, 13), (101, 68), (220, 68)]:
         d.ellipse((p[0] - 1, p[1] - 1, p[0] + 1, p[1] + 1), fill="#fff5d6", outline="#111111")
     d.text((111, 17), "Bekasi, IDN", font=FONT_SMALL, fill="#fff5d6")
-    text_shadow(d, (111, 30), "RIZBINASS", FONT_BIG)
+    centered_shadow(d, (104, 31, 218, 62), "RIZBINASS", FONT_BIG)
 
 
 def draw_player(d, x, y, step, hurt=False):
@@ -142,29 +152,31 @@ def draw_enemy(d, x, y):
 
 
 def draw_logo(d, name, color, cx, cy):
-    r = 11
-    d.rounded_rectangle((cx - r, cy - r, cx + r, cy + r), radius=2, fill="#fff7dd", outline="#111111", width=1)
+    r = 12
+    tile_fill = "#050505" if name == "React" else "#fff7dd"
+    d.rounded_rectangle((cx - r, cy - r, cx + r, cy + r), radius=2, fill=tile_fill, outline="#111111", width=1)
     ix = cx
     if name == "React":
-        d.ellipse((ix - 8, cy - 4, ix + 8, cy + 4), outline=color, width=1)
-        d.ellipse((ix - 4, cy - 8, ix + 4, cy + 8), outline=color, width=1)
+        d.ellipse((ix - 9, cy - 4, ix + 9, cy + 4), outline=color, width=2)
+        d.arc((ix - 7, cy - 10, ix + 7, cy + 10), 35, 325, fill=color, width=2)
+        d.arc((ix - 7, cy - 10, ix + 7, cy + 10), 215, 145, fill=color, width=2)
         d.ellipse((ix - 2, cy - 2, ix + 2, cy + 2), fill=color)
     elif name == "TypeScript":
-        rect(d, (ix - 8, cy - 8, ix + 8, cy + 8), color)
-        d.text((ix - 6, cy - 5), "TS", font=FONT_SMALL, fill="#ffffff")
+        rect(d, (ix - 10, cy - 10, ix + 10, cy + 10), "#3178c6")
+        d.text((ix - 8, cy - 6), "TS", font=FONT_MED, fill="#ffffff")
     elif name == "JavaScript":
-        rect(d, (ix - 8, cy - 8, ix + 8, cy + 8), color)
-        d.text((ix - 6, cy - 5), "JS", font=FONT_SMALL, fill="#111111")
+        rect(d, (ix - 10, cy - 10, ix + 10, cy + 10), "#f7df1e")
+        d.text((ix - 8, cy - 6), "JS", font=FONT_MED, fill="#111111")
     elif name == "Tailwind":
-        d.arc((ix - 10, cy - 6, ix, cy + 5), 190, 350, fill=color, width=2)
-        d.arc((ix, cy - 6, ix + 10, cy + 5), 190, 350, fill="#0ea5e9", width=2)
+        d.arc((ix - 10, cy - 7, ix + 2, cy + 5), 190, 350, fill="#38bdf8", width=3)
+        d.arc((ix - 2, cy - 2, ix + 10, cy + 10), 190, 350, fill="#0ea5e9", width=3)
     elif name == "Figma":
         colors = ["#f24e1e", "#ff7262", "#a259ff", "#1abcfe", "#0acf83"]
-        pts = [(ix - 4, cy - 6), (ix + 3, cy - 6), (ix - 4, cy), (ix + 3, cy), (ix - 4, cy + 6)]
+        pts = [(ix - 4, cy - 7), (ix + 3, cy - 7), (ix - 4, cy), (ix + 3, cy), (ix - 4, cy + 7)]
         for (px, py), c in zip(pts, colors):
-            d.ellipse((px - 3, py - 3, px + 3, py + 3), fill=c, outline="#111111")
+            d.ellipse((px - 4, py - 4, px + 4, py + 4), fill=c)
     else:
-        d.polygon([(ix - 8, cy - 8), (ix + 7, cy - 8), (ix, cy), (ix + 7, cy), (ix - 8, cy + 8)], fill=color, outline="#111111")
+        d.polygon([(ix - 8, cy - 10), (ix + 8, cy - 10), (ix, cy - 2), (ix + 8, cy - 2), (ix - 8, cy + 10)], fill="#050505")
 
 
 def player_position(i):
