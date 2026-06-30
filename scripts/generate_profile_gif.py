@@ -9,8 +9,9 @@ OUT = ROOT / "assets" / "rizbinass-mario.gif"
 
 W, H = 320, 160
 SCALE = 3
-FRAMES = 96
+FRAMES = 132
 GROUND_Y = 132
+ENEMY_X = 265
 
 
 TECHS = [
@@ -109,7 +110,16 @@ def draw_title(d):
     text_shadow(d, (111, 30), "RIZBINASS", FONT_BIG)
 
 
-def draw_player(d, x, y, step):
+def draw_player(d, x, y, step, hurt=False):
+    if hurt:
+        d.rectangle((x + 3, y + 20, x + 16, y + 26), fill="#e24a25", outline="#111111")
+        d.rectangle((x + 1, y + 12, x + 12, y + 20), fill="#f4b169", outline="#111111")
+        d.rectangle((x - 1, y + 10, x + 12, y + 14), fill="#d73320", outline="#111111")
+        d.rectangle((x + 7, y + 14, x + 8, y + 15), fill="#111111")
+        d.line((x + 15, y + 11, x + 20, y + 7), fill="#f4b169", width=2)
+        d.line((x + 15, y + 24, x + 21, y + 28), fill="#4d79d8", width=2)
+        return
+
     leg = 2 if step % 2 == 0 else -1
     d.rectangle((x + 5, y + 11, x + 12, y + 23), fill="#e24a25", outline="#111111")
     d.rectangle((x + 3, y + 4, x + 13, y + 12), fill="#f4b169", outline="#111111")
@@ -132,40 +142,45 @@ def draw_enemy(d, x, y):
 
 
 def draw_logo(d, name, color, cx, cy):
-    d.rounded_rectangle((cx - 43, cy - 16, cx + 43, cy + 16), radius=3, fill="#fff7dd", outline="#111111", width=1)
-    ix = cx - 19
+    r = 11
+    d.rounded_rectangle((cx - r, cy - r, cx + r, cy + r), radius=2, fill="#fff7dd", outline="#111111", width=1)
+    ix = cx
     if name == "React":
-        for r in (0, 60, -60):
-            d.ellipse((ix - 14, cy - 6, ix + 14, cy + 6), outline=color, width=2)
-        d.ellipse((ix - 3, cy - 3, ix + 3, cy + 3), fill=color)
+        d.ellipse((ix - 8, cy - 4, ix + 8, cy + 4), outline=color, width=1)
+        d.ellipse((ix - 4, cy - 8, ix + 4, cy + 8), outline=color, width=1)
+        d.ellipse((ix - 2, cy - 2, ix + 2, cy + 2), fill=color)
     elif name == "TypeScript":
-        rect(d, (ix - 12, cy - 12, ix + 12, cy + 12), color)
-        d.text((ix - 7, cy - 7), "TS", font=FONT_MED, fill="#ffffff")
+        rect(d, (ix - 8, cy - 8, ix + 8, cy + 8), color)
+        d.text((ix - 6, cy - 5), "TS", font=FONT_SMALL, fill="#ffffff")
     elif name == "JavaScript":
-        rect(d, (ix - 12, cy - 12, ix + 12, cy + 12), color)
-        d.text((ix - 7, cy - 7), "JS", font=FONT_MED, fill="#111111")
+        rect(d, (ix - 8, cy - 8, ix + 8, cy + 8), color)
+        d.text((ix - 6, cy - 5), "JS", font=FONT_SMALL, fill="#111111")
     elif name == "Tailwind":
-        d.arc((ix - 14, cy - 8, ix + 2, cy + 8), 190, 350, fill=color, width=3)
-        d.arc((ix - 1, cy - 8, ix + 15, cy + 8), 190, 350, fill="#0ea5e9", width=3)
+        d.arc((ix - 10, cy - 6, ix, cy + 5), 190, 350, fill=color, width=2)
+        d.arc((ix, cy - 6, ix + 10, cy + 5), 190, 350, fill="#0ea5e9", width=2)
     elif name == "Figma":
         colors = ["#f24e1e", "#ff7262", "#a259ff", "#1abcfe", "#0acf83"]
-        pts = [(ix - 5, cy - 9), (ix + 3, cy - 9), (ix - 5, cy), (ix + 3, cy), (ix - 5, cy + 9)]
+        pts = [(ix - 4, cy - 6), (ix + 3, cy - 6), (ix - 4, cy), (ix + 3, cy), (ix - 4, cy + 6)]
         for (px, py), c in zip(pts, colors):
-            d.ellipse((px - 5, py - 5, px + 5, py + 5), fill=c, outline="#111111")
+            d.ellipse((px - 3, py - 3, px + 3, py + 3), fill=c, outline="#111111")
     else:
-        d.polygon([(ix - 11, cy - 12), (ix + 10, cy - 12), (ix - 1, cy), (ix + 10, cy), (ix - 11, cy + 12)], fill=color, outline="#111111")
-    d.text((cx - 2, cy - 4), name, font=FONT_SMALL, fill="#111111")
+        d.polygon([(ix - 8, cy - 8), (ix + 7, cy - 8), (ix, cy), (ix + 7, cy), (ix - 8, cy + 8)], fill=color, outline="#111111")
 
 
 def player_position(i):
-    if i < 24:
-        return 93 + i * 1.6, GROUND_Y - 28
-    if i < 42:
-        t = (i - 24) / 18
-        x = 131 + t * 18
-        y = GROUND_Y - 28 - sin(t * pi) * 38
-        return x, y
-    return 149 + (i - 42) * 0.22, GROUND_Y - 28
+    stand_y = GROUND_Y - 28
+    if i < 28:
+        return 91 + i * 1.45, stand_y, False
+    if i < 43:
+        t = (i - 28) / 15
+        x = 132 + t * 17
+        y = stand_y - sin(t * pi) * 8
+        return x, y, False
+    if i < 116:
+        return 149 + (i - 43) * 1.38, stand_y, False
+    if i < 124:
+        return 246, stand_y + min(7, i - 116), True
+    return 246, stand_y + 7, True
 
 
 def render_frame(i):
@@ -192,15 +207,19 @@ def render_frame(i):
 
     bump = max(0, int(5 - abs(i - 40))) if 36 <= i <= 44 else 0
     draw_question_block(d, 145, 82, bump)
-    if i >= 38:
-        tech = TECHS[((i - 38) // 9) % len(TECHS)]
+    if i >= 39:
+        tech = TECHS[((i - 39) // 9) % len(TECHS)]
         bob = int(sin(i / 3) * 2)
-        draw_logo(d, tech[0], tech[1], 152, 63 + bob)
+        draw_logo(d, tech[0], tech[1], 152, 74 + bob)
 
     draw_ground(d)
-    draw_enemy(d, 252, 112)
-    px, py = player_position(i)
-    draw_player(d, int(px), int(py), i // 6)
+    draw_enemy(d, ENEMY_X, 112)
+    px, py, hurt = player_position(i)
+    draw_player(d, int(px), int(py), i // 6, hurt=hurt)
+    if hurt:
+        d.line((263, 112, 267, 108), fill="#ffd166", width=1)
+        d.line((267, 112, 263, 108), fill="#ffd166", width=1)
+        d.point((266, 107), fill="#ffffff")
 
     if 38 <= i <= 43:
         d.text((160, 75 - bump), "+", font=FONT_SMALL, fill="#fff7dd")
